@@ -55,6 +55,11 @@ public class MPathfinding
             foreach (MPathNode neighbourNode in GetNeighbourList(currentNode))
             {
                 if (closedList.Contains(neighbourNode)) continue;
+                if (!neighbourNode.isWalkable)
+                {
+                    closedList.Add(neighbourNode);
+                    continue;
+                }
 
                 int tentativeGCost = currentNode.gCost + CalculateDistanceCost(currentNode, neighbourNode);
                 if (tentativeGCost < neighbourNode.gCost)
@@ -110,6 +115,16 @@ public class MPathfinding
                 neighbourList.Add(GetNode(currentNode.x + 1, currentNode.y + 1));
             }
         }
+        //Down
+        if (currentNode.y - 1 >= 0)
+        {
+            neighbourList.Add(GetNode(currentNode.x, currentNode.y - 1));
+        }
+        //Up
+        if (currentNode.y + 1 < mGrid.GetHeight())
+        {
+            neighbourList.Add(GetNode(currentNode.x, currentNode.y + 1));
+        }
 
         return neighbourList;
     }
@@ -130,7 +145,7 @@ public class MPathfinding
         return path;
     }
 
-    private MPathNode GetNode(int x, int y)
+    public MPathNode GetNode(int x, int y)
     {
        return mGrid.GetGridObject(x, y);
     }
@@ -140,7 +155,7 @@ public class MPathfinding
         int xDistance = Mathf.Abs(a.x - b.x);
         int yDistance = Mathf.Abs(a.y - b.y);
         int remaining = Mathf.Abs(xDistance - yDistance);
-        return MOVE_DIAGONAL_COST * Mathf.Min(xDistance, yDistance) + MOVE_STRAIGHT_COST + remaining;
+        return MOVE_DIAGONAL_COST * Mathf.Min(xDistance, yDistance) + MOVE_STRAIGHT_COST * remaining;
     }
 
     private MPathNode GetLowestFCostNode(List<MPathNode> nodeList)

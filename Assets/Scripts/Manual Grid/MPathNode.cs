@@ -14,6 +14,7 @@ public class MPathNode
     public int hCost;
     public int fCost;
 
+    public bool isWalkable;
     public MPathNode cameFromNode;
 
     private TextMesh debugText;
@@ -23,6 +24,7 @@ public class MPathNode
         this.mGrid = mGrid;
         this.x = x;
         this.y = y;
+        this.isWalkable = true;
 
         debugText = new TextMesh();
 
@@ -36,6 +38,12 @@ public class MPathNode
         {
             debugText.text = fCost.ToString();
         }
+    }
+
+    public void SetIsWalkable(bool isWalkable)
+    {
+        this.isWalkable = isWalkable;
+        debugText.text = "Wall";
     }
 
     //public override string ToString()
