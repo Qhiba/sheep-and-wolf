@@ -7,16 +7,41 @@ public class MPathfinding
     private const int MOVE_STRAIGHT_COST = 10;
     private const int MOVE_DIAGONAL_COST = 14;
 
+    public static MPathfinding Instance { get; private set; }
+    
+
     private MGrid<MPathNode> mGrid;
     private List<MPathNode> openList;
     private List<MPathNode> closedList;
 
     public MPathfinding(int width, int height)
     {
+        Instance = this;
         mGrid = new MGrid<MPathNode>(width, height, 1.0f, Vector3.zero, (MGrid<MPathNode> g, int x, int y) => new MPathNode(g, x, y));
     }
 
     public MGrid<MPathNode> GetGrid() { return mGrid; }
+
+    public List<Vector3> FindPath(Vector3 startWorldPosition, Vector3 endWorldPosition)
+    {
+        mGrid.GetXY(startWorldPosition, out int startX, out int startY);
+        mGrid.GetXY(endWorldPosition, out int endX, out int endY);
+
+        List<MPathNode> path = FindPath(startX, startY, endX, endY);
+        if (path == null)
+        {
+            return null;
+        }
+        else
+        {
+            List<Vector3> vectorPath = new List<Vector3>();
+            foreach (MPathNode node in path)
+            {
+                vectorPath.Add(new Vector3(node.x, node.y) * mGrid.GetCellSize() + Vector3.one * mGrid.GetCellSize() * 0.5f);
+            }
+            return vectorPath;
+        }
+    }
 
     public List<MPathNode> FindPath(int startX, int startY, int endX, int endY)
     {

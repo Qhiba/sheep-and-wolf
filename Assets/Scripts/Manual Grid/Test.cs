@@ -8,6 +8,7 @@ using UnityEditor.Experimental.GraphView;
 public class Test : MonoBehaviour
 {
     private MPathfinding pathfinding;
+    [SerializeField] private MCharacterPathfinding characterPathfinding;
 
     private void Start()
     {
@@ -30,6 +31,8 @@ public class Test : MonoBehaviour
                     Debug.DrawLine(new Vector3(path[i].x, path[i].y) + Vector3.one * 0.5f, new Vector3(path[i + 1].x, path[i + 1].y) + Vector3.one * 0.5f, Color.green, 100f);
                 }
             }
+
+            characterPathfinding.SetTargetPosition(mouseWorldPosition);
         }
 
         if (Input.GetMouseButtonDown(1)) {
