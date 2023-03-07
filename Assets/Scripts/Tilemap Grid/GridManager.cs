@@ -21,13 +21,16 @@ public class GridManager : MonoBehaviour
     
     [SerializeField] private Tilemap groundTile;
     [SerializeField] private Tile walkableTile;
-    //[SerializeField] private Tile unwalkableTile;
 
-    private Grid grid;
+    //[SerializeField] private Grid grid;
+    
     private NodeData[,] nodes;
 
-    // 
-    public void Awake()
+    private LineRenderer gridLine;
+    private Color gridLineColor = Color.white;
+    private float gridLineWidth = 0.025f;
+
+    private void Awake()
     {
         BoundsInt cellBound = groundTile.cellBounds;
         Vector3Int offset = new Vector3Int(Mathf.Abs(cellBound.min.x), Mathf.Abs(cellBound.min.y), 0);
@@ -53,6 +56,12 @@ public class GridManager : MonoBehaviour
 
         Debug.Log(string.Format("Tile Size : {0} -- Node Size : {1}, {2}", cellBound.size, nodes.GetLength(0), nodes.GetLength(1)));
         groundTile.RefreshAllTiles();
+    }
+
+    private void Start()
+    {
+        gridLine = GetComponent<LineRenderer>();
+        CreateGridLine();
     }
 
     public void VisualizeWalkablePath()
@@ -81,34 +90,56 @@ public class GridManager : MonoBehaviour
         }
     }
 
-    public void ShowGridLine()
+    public void ShowGridLine(bool isActive)
     {
-       
+        gridLine.enabled = isActive;
+    }
 
-        //int width = nodes.GetLength(0);
-        //int height = nodes.GetLength(1);
+    public void CreateGridLine()
+    {
+        Vector3 cellSize = groundTile.cellSize;
+        int width = nodes.GetLength(0);
+        int height = nodes.GetLength(1);
 
-        //for (int x = 0; x < width; x++)
-        //{
-        //    for (int y = 0; y < height; y++)
-        //    {
-        //        Debug.DrawLine(
-        //            nodes[x, y].GetWorldPosition(), 
-        //            nodes[x, y].GetWorldPosition() + new Vector3(groundTile.cellSize.x, 0.0f, 0.0f), 
-        //            Color.white, 100f);
-        //        Debug.DrawLine(
-        //            nodes[x, y].GetWorldPosition(),
-        //            nodes[x, y].GetWorldPosition() + new Vector3(0.0f, groundTile.cellSize.y, 0.0f),
-        //            Color.white, 100f);
-        //    }
-        //}
-        //Debug.DrawLine(
-        //    new Vector3(nodes[0, 0].GetWorldPosition().x, nodes[0, height - 1].GetWorldPosition().y + groundTile.cellSize.y, 0.0f), 
-        //    nodes[width - 1, height - 1].GetWorldPosition() + groundTile.cellSize, 
-        //    Color.white, 100f);
-        //Debug.DrawLine(
-        //    new Vector3(nodes[width - 1, 0].GetWorldPosition().x + groundTile.cellSize.x, nodes[0, 0].GetWorldPosition().y, 0.0f),
-        //    nodes[width - 1, height - 1].GetWorldPosition() + groundTile.cellSize,
-        //    Color.white, 100f);
+        gridLine.startColor = gridLineColor;
+        gridLine.endColor = gridLineColor;
+        gridLine.startWidth = gridLineWidth;
+        gridLine.endWidth = gridLineWidth;
+
+        int numLines = 3 * ((width + 1) + (height - 1)); // 1 Line need 3 dots or index.
+        gridLine.positionCount = numLines;
+
+        int index = 0;
+        Vector3 startPos;
+        Vector3 endPos;
+
+        for (int x = 0; x < width; x++)
+        {
+            startPos = nodes[x, 0].GetWorldPosition();
+            endPos = nodes[x, height - 1].GetWorldPosition() + new Vector3(0.0f, cellSize.y, 0.0f);
+
+            gridLine.SetPosition(index++, startPos);
+            gridLine.SetPosition(index++, endPos);
+            gridLine.SetPosition(index++, startPos);
+        }
+
+        startPos = nodes[width - 1, 0].GetWorldPosition() + new Vector3(cellSize.x, 0.0f, 0.0f);
+        endPos = nodes[width - 1, height - 1].GetWorldPosition() + cellSize;
+
+        gridLine.SetPosition(index++, startPos);
+        gridLine.SetPosition(index++, endPos);
+
+        //Set Line to Top Left Edge of Grid
+        gridLine.SetPosition(index++, nodes[0, height - 1].GetWorldPosition() + new Vector3(0.0f, cellSize.y, 0.0f));
+
+        for (int y = height - 1; y > 0; y--)
+        {
+            startPos = nodes[0, y].GetWorldPosition();
+            endPos = nodes[width - 1, y].GetWorldPosition() + new Vector3(cellSize.x, 0.0f, 0.0f);
+
+            gridLine.SetPosition(index++, startPos);
+            gridLine.SetPosition(index++, endPos);
+            gridLine.SetPosition(index++, startPos);
+        }
     }
 }

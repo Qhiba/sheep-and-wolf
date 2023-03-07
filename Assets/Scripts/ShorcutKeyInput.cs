@@ -6,6 +6,7 @@ using UnityEngine.Tilemaps;
 public class ShorcutKeyInput : MonoBehaviour
 {
     private bool isWalkableVisualize = false;
+    private bool isGridLineShown = false;
 
     // Update is called once per frame
     void Update()
@@ -26,7 +27,8 @@ public class ShorcutKeyInput : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.G))
         {
-            GridManager.Instance.ShowGridLine();
+            isGridLineShown = !isGridLineShown;
+            GridManager.Instance.ShowGridLine(isGridLineShown);
         }
     }
 }
