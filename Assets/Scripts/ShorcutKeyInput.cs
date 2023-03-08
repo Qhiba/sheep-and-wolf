@@ -15,11 +15,11 @@ public class ShorcutKeyInput : MonoBehaviour
         {
             if (isWalkableVisualize)
             {
-                GridManager.Instance.ResetColor();
+                VisualizationManager.Instance.ResetColor();
             }
             else
             {
-                GridManager.Instance.VisualizeWalkablePath();
+                VisualizationManager.Instance.VisualizeWalkablePath();
             }
 
             isWalkableVisualize = !isWalkableVisualize;
@@ -28,7 +28,7 @@ public class ShorcutKeyInput : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.G))
         {
             isGridLineShown = !isGridLineShown;
-            GridManager.Instance.ShowGridLine(isGridLineShown);
+            VisualizationManager.Instance.ShowGridLine(isGridLineShown);
         }
     }
 }

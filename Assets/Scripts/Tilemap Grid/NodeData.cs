@@ -6,23 +6,24 @@ using UnityEngine.Tilemaps;
 public class NodeData
 {
     private Tilemap tilemap;
-    private int x;
-    private int y;
+    private Vector3Int gridPos;
     private Vector3Int cellPos;
 
-    private int gCost;
-    private int hCost;
-    private int fCost;
+    private int? gCost = null;
+    private int? hCost = null;
+    private int? fCost = null;
 
     private bool isWalkable;
     private NodeData cameFromNode;
 
-    public NodeData(Tilemap tilemap, int x, int y, Vector3Int cellPos)
+    private List<NodeData> neighborNodes;
+
+    public NodeData(Tilemap tilemap, Vector3Int gridPos, Vector3Int cellPos)
     {
         this.tilemap = tilemap;
-        this.x = x;
-        this.y = y;
+        this.gridPos = gridPos;
         this.cellPos = cellPos;
+        this.neighborNodes = new List<NodeData>();
     }
 
     public void SetWalkable(bool isWalkable)
@@ -43,5 +44,25 @@ public class NodeData
     public Vector3 GetWorldPosition()
     {
         return tilemap.CellToWorld(cellPos);
+    }
+
+    public Vector3Int GetGridPos()
+    {
+        return gridPos;
+    }
+
+    public List<NodeData> GetNeighborNodes()
+    {
+        return neighborNodes;
+    }
+
+    public void SetNeighborNodes(NodeData neighbor)
+    {
+        neighborNodes.Add(neighbor);
+    }
+
+    public void CalculateFCost()
+    {
+        fCost = gCost + hCost;
     }
 }
