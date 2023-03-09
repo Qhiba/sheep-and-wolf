@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -32,25 +31,15 @@ public class GridManager : MonoBehaviour
         SearchAndSetNodeNeighbor();
     }
 
-    private void Start()
-    {
-        Debug.Log(null == null);
-    }
-
     public Tilemap GetTilemap()
     {
         return groundTilemap;
     }
 
-    public NodeData[,] getAllNodeData()
-    {
-        return nodes;
-    }
-
     private void RealocateNodeToGrid()
     {
         BoundsInt cellBound = groundTilemap.cellBounds;
-        Vector3Int offset = new Vector3Int(Mathf.Abs(cellBound.min.x), Mathf.Abs(cellBound.min.y), 0);
+        Vector3Int offset = new Vector3Int(cellBound.min.x, cellBound.min.y, 0);
 
         nodes = new NodeData[cellBound.size.x, cellBound.size.y];
 
@@ -58,18 +47,42 @@ public class GridManager : MonoBehaviour
         {
             for (int y = 0; y < cellBound.size.y; y++)
             {
-                Vector3Int cellPos = new Vector3Int(x, y, 0) - offset;
+                Vector3Int cellPos = new Vector3Int(x, y, 0) + offset;
                 TileBase tile = groundTilemap.GetTile(cellPos);
 
                 if (tile == null) continue;
 
                 NodeData node = new NodeData(groundTilemap, new Vector3Int(x, y, 0), cellPos);
-                node.SetWalkable(tile == walkableTile ? true : false);
+                node.isWalkable = (tile == walkableTile ? true : false);
                 nodes[x, y] = node;
             }
         }
 
         Debug.Log(string.Format("Tile Size : {0} -- Node Size : {1}, {2}", cellBound.size, nodes.GetLength(0), nodes.GetLength(1)));
+    }
+
+    public Vector3Int GetGridSize()
+    {
+        return new Vector3Int(nodes.GetLength(0), nodes.GetLength(1), 0);
+    }
+
+    public NodeData[,] GetAllNodeData()
+    {
+        return nodes;
+    }
+
+    public NodeData GetNode(int x, int y)
+    {
+        return nodes[x, y];
+    }
+
+    public NodeData GetNode(Vector3 worldPosition)
+    {
+        Vector3Int offset = new Vector3Int(groundTilemap.cellBounds.min.x, groundTilemap.cellBounds.min.y, 0);
+        Vector3Int nodeCell = groundTilemap.WorldToCell(worldPosition);
+        Vector3Int gridPos = nodeCell - offset;
+
+        return GetNode(gridPos.x, gridPos.y);
     }
 
     private void SearchAndSetNodeNeighbor()

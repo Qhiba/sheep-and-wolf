@@ -45,10 +45,4 @@ public class MPathNode
         this.isWalkable = isWalkable;
         debugText.text = "Wall";
     }
-
-    //public override string ToString()
-    //{
-    //    Debug.Log(mGrid);
-    //    return x + ":" + y;
-    //}
 }

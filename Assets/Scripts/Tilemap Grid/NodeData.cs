@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using CodeMonkey.Utils;
 
 public class NodeData
 {
@@ -9,14 +10,16 @@ public class NodeData
     private Vector3Int gridPos;
     private Vector3Int cellPos;
 
-    private int? gCost = null;
-    private int? hCost = null;
-    private int? fCost = null;
+    public int gCost;
+    public int hCost;
+    public int fCost;
 
-    private bool isWalkable;
-    private NodeData cameFromNode;
+    public bool isWalkable;
+    public NodeData cameFromNode;
 
     private List<NodeData> neighborNodes;
+
+    private TextMesh debugText;
 
     public NodeData(Tilemap tilemap, Vector3Int gridPos, Vector3Int cellPos)
     {
@@ -24,16 +27,10 @@ public class NodeData
         this.gridPos = gridPos;
         this.cellPos = cellPos;
         this.neighborNodes = new List<NodeData>();
-    }
 
-    public void SetWalkable(bool isWalkable)
-    {
-        this.isWalkable = isWalkable;
-    }
+        //debugText = new TextMesh();
 
-    public bool GetWalkable()
-    {
-        return this.isWalkable;
+        //debugText = UtilsClass.CreateWorldText(fCost.ToString(), GameObject.Find("PathNodes").transform, GetWorldPosition() + tilemap.cellSize * 0.5f, 0.2f, 20, Color.white, TextAnchor.MiddleCenter);
     }
 
     public Vector3Int GetCellPosition()

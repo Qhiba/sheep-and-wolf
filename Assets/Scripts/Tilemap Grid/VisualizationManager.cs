@@ -28,7 +28,7 @@ public class VisualizationManager : MonoBehaviour
 
     private void Start()
     {
-        nodes = GridManager.Instance.getAllNodeData();
+        nodes = GridManager.Instance.GetAllNodeData();
         groundTile = GridManager.Instance.GetTilemap();
         
         gridLine = GetComponent<LineRenderer>();
@@ -41,7 +41,7 @@ public class VisualizationManager : MonoBehaviour
             for (int y = 0; y < nodes.GetLength(1); y++)
             {
                 Vector3Int cellPos = nodes[x, y].GetCellPosition();
-                Color color = nodes[x, y].GetWalkable() ? Color.green : Color.red;
+                Color color = nodes[x, y].isWalkable ? Color.green : Color.red;
                 groundTile.SetTileFlags(cellPos, TileFlags.None);
                 groundTile.SetColor(cellPos, color);
             }
@@ -118,5 +118,10 @@ public class VisualizationManager : MonoBehaviour
         }
 
         isGridLineCreated = true;
+    }
+
+    public void ShowCalculation()
+    {
+
     }
 }
