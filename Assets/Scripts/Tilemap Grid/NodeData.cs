@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using CodeMonkey.Utils;
+using UnityEditor.Experimental.GraphView;
 
 public class NodeData
 {
@@ -28,11 +29,9 @@ public class NodeData
         this.cellPos = cellPos;
         this.neighborNodes = new List<NodeData>();
 
-        //debugText = new TextMesh();
-
-        //debugText = UtilsClass.CreateWorldText(fCost.ToString(), GameObject.Find("PathNodes").transform, GetWorldPosition() + tilemap.cellSize * 0.5f, 0.2f, 20, Color.white, TextAnchor.MiddleCenter);
+        debugText = new TextMesh();
+        debugText = UtilsClass.CreateWorldText(" ", GameObject.Find("NodePath").transform, GetWorldPosition() + tilemap.cellSize * 0.5f, 0.2f, 20, Color.white, TextAnchor.MiddleCenter);
     }
-
     public Vector3Int GetCellPosition()
     {
         return this.cellPos;
@@ -61,5 +60,9 @@ public class NodeData
     public void CalculateFCost()
     {
         fCost = gCost + hCost;
+        if (fCost < int.MaxValue)
+        {
+            debugText.text = fCost.ToString();
+        }
     }
 }
