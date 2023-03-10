@@ -20,7 +20,9 @@ public class NodeData
 
     private List<NodeData> neighborNodes;
 
-    private TextMesh debugText;
+    private TextMesh gCostText;
+    private TextMesh hCostText;
+    private TextMesh fCostText;
 
     public NodeData(Tilemap tilemap, Vector3Int gridPos, Vector3Int cellPos)
     {
@@ -29,8 +31,13 @@ public class NodeData
         this.cellPos = cellPos;
         this.neighborNodes = new List<NodeData>();
 
-        debugText = new TextMesh();
-        debugText = UtilsClass.CreateWorldText(" ", GameObject.Find("NodePath").transform, GetWorldPosition() + tilemap.cellSize * 0.5f, 0.2f, 20, Color.white, TextAnchor.MiddleCenter);
+        fCostText = new TextMesh();
+        gCostText = new TextMesh();
+        hCostText = new TextMesh();
+
+        fCostText = UtilsClass.CreateWorldText("F", GameObject.Find("NodePath").transform, GetWorldPosition() + tilemap.cellSize * 0.5f, 0.2f, 20, Color.white, TextAnchor.MiddleCenter);
+        gCostText = UtilsClass.CreateWorldText("G", GameObject.Find("NodePath").transform, GetWorldPosition() + tilemap.cellSize * 0.80f, 0.2f, 10, Color.blue, TextAnchor.MiddleCenter);
+        hCostText = UtilsClass.CreateWorldText("H", GameObject.Find("NodePath").transform, GetWorldPosition() + tilemap.cellSize * 0.20f, 0.2f, 10, Color.red, TextAnchor.MiddleCenter);
     }
     public Vector3Int GetCellPosition()
     {
@@ -62,7 +69,9 @@ public class NodeData
         fCost = gCost + hCost;
         if (fCost < int.MaxValue)
         {
-            debugText.text = fCost.ToString();
+            gCostText.text = gCost.ToString();
+            hCostText.text = hCost.ToString();
+            fCostText.text = fCost.ToString();
         }
     }
 }

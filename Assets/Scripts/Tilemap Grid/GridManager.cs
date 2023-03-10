@@ -66,6 +66,11 @@ public class GridManager : MonoBehaviour
         return new Vector3Int(nodes.GetLength(0), nodes.GetLength(1), 0);
     }
 
+    public Vector3 GetCellSize()
+    {
+        return groundTilemap.cellSize;
+    }
+
     public NodeData[,] GetAllNodeData()
     {
         return nodes;
