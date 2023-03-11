@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using CodeMonkey.Utils;
 
 public class VisualizationManager : MonoBehaviour
 {
@@ -25,6 +26,8 @@ public class VisualizationManager : MonoBehaviour
     private Color gridLineColor = Color.white;
     private float gridLineWidth = 0.025f;
     private bool isGridLineCreated = false;
+
+    public GameObject textParent;
 
     private void Start()
     {
@@ -120,8 +123,11 @@ public class VisualizationManager : MonoBehaviour
         isGridLineCreated = true;
     }
 
-    public void ShowCalculation()
+    public void ShowAStarVariables(bool isActive)
     {
-
+        foreach (var node in nodes)
+        {
+            node.ShowAStarVariables(isActive);
+        }
     }
 }

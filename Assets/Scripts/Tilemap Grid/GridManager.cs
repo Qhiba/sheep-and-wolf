@@ -87,6 +87,12 @@ public class GridManager : MonoBehaviour
         Vector3Int nodeCell = groundTilemap.WorldToCell(worldPosition);
         Vector3Int gridPos = nodeCell - offset;
 
+        if (gridPos.x >= nodes.GetLength(0) || gridPos.x < 0 ||
+            gridPos.y >= nodes.GetLength(1) || gridPos.y < 0)
+        {
+            return null;
+        }
+
         return GetNode(gridPos.x, gridPos.y);
     }
 

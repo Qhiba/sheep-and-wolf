@@ -6,6 +6,14 @@ public class ShorcutKeyInput : MonoBehaviour
 {
     private bool isWalkableVisualize = false;
     private bool isGridLineShown = false;
+    private bool isAStarVariableShown = false;
+
+    private void Start()
+    {
+        //isWalkableVisualize = false;
+        //isGridLineShown = false;
+        //isAStarVariableShown = false;
+    }
 
     // Update is called once per frame
     void Update()
@@ -28,6 +36,12 @@ public class ShorcutKeyInput : MonoBehaviour
         {
             isGridLineShown = !isGridLineShown;
             VisualizationManager.Instance.ShowGridLine(isGridLineShown);
+        }
+
+        if (Input.GetKeyDown(KeyCode.P))
+        {
+            isAStarVariableShown = !isAStarVariableShown;
+            VisualizationManager.Instance.ShowAStarVariables(isAStarVariableShown);
         }
     }
 }

@@ -35,9 +35,11 @@ public class NodeData
         gCostText = new TextMesh();
         hCostText = new TextMesh();
 
-        fCostText = UtilsClass.CreateWorldText("F", GameObject.Find("NodePath").transform, GetWorldPosition() + tilemap.cellSize * 0.5f, 0.2f, 20, Color.white, TextAnchor.MiddleCenter);
-        gCostText = UtilsClass.CreateWorldText("G", GameObject.Find("NodePath").transform, GetWorldPosition() + tilemap.cellSize * 0.80f, 0.2f, 10, Color.blue, TextAnchor.MiddleCenter);
-        hCostText = UtilsClass.CreateWorldText("H", GameObject.Find("NodePath").transform, GetWorldPosition() + tilemap.cellSize * 0.20f, 0.2f, 10, Color.red, TextAnchor.MiddleCenter);
+        fCostText = UtilsClass.CreateWorldText("F", GameObject.Find("NodePathText").transform, GetWorldPosition() + tilemap.cellSize * 0.5f, 0.2f, 30, Color.white, TextAnchor.MiddleCenter);
+        gCostText = UtilsClass.CreateWorldText("G", GameObject.Find("NodePathText").transform, GetWorldPosition() + tilemap.cellSize * 0.80f, 0.2f, 20, Color.blue, TextAnchor.MiddleCenter);
+        hCostText = UtilsClass.CreateWorldText("H", GameObject.Find("NodePathText").transform, GetWorldPosition() + tilemap.cellSize * 0.20f, 0.2f, 20, Color.red, TextAnchor.MiddleCenter);
+
+        ShowAStarVariables(false);
     }
     public Vector3Int GetCellPosition()
     {
@@ -73,5 +75,12 @@ public class NodeData
             hCostText.text = hCost.ToString();
             fCostText.text = fCost.ToString();
         }
+    }
+
+    public void ShowAStarVariables(bool isActive)
+    {
+        fCostText.gameObject.SetActive(isActive);
+        gCostText.gameObject.SetActive(isActive);
+        hCostText.gameObject.SetActive(isActive);
     }
 }

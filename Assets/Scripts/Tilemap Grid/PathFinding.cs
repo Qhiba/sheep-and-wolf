@@ -22,8 +22,10 @@ public class Pathfinding
 
     public List<Vector3> FindPath(Vector3 startWorldPosition, Vector3 endWorldPosition)
     {
-        NodeData startNode = gridManager.GetNode(startWorldPosition);
-        NodeData endNode = gridManager.GetNode(endWorldPosition);
+        NodeData? startNode = gridManager.GetNode(startWorldPosition);
+        NodeData? endNode = gridManager.GetNode(endWorldPosition);
+
+        if (startNode == null || endNode == null) return null;
 
         Debug.Log("Start Node: " + startNode.GetGridPos() + " End Node: " +  endNode.GetGridPos());
 

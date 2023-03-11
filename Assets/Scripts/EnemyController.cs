@@ -37,6 +37,10 @@ public class EnemyController : MonoBehaviour
 
                     StartCoroutine(MoveAlongPath(path));   
                 }
+                else
+                {
+                    Debug.Log("No Path Found!");
+                }
             }
         }
     }
