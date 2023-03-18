@@ -41,6 +41,7 @@ public class NodeData
 
         ShowAStarVariables(false);
     }
+
     public Vector3Int GetCellPosition()
     {
         return this.cellPos;

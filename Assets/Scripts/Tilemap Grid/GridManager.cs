@@ -54,6 +54,13 @@ public class GridManager : MonoBehaviour
 
                 NodeData node = new NodeData(groundTilemap, new Vector3Int(x, y, 0), cellPos);
                 node.isWalkable = (tile == walkableTile ? true : false);
+
+                if(tile == walkableTile)
+                {
+                    node.isWalkable = true;
+                }
+
+
                 nodes[x, y] = node;
             }
         }
@@ -129,18 +136,18 @@ public class GridManager : MonoBehaviour
             }
         }
 
-        // Left Position
+        // Right Position
         if (nodeGridPos.x + 1 < nodes.GetLength(0))
         {
             node.SetNeighborNodes(nodes[nodeGridPos.x + 1, nodeGridPos.y]);
 
-            // Left Down Position
+            // Right Down Position
             if (nodeGridPos.y - 1 >= 0)
             {
                 node.SetNeighborNodes(nodes[nodeGridPos.x + 1, nodeGridPos.y - 1]);
             }
 
-            // Left Up Position
+            // Right Up Position
             if (nodeGridPos.y + 1 < nodes.GetLength(1))
             {
                 node.SetNeighborNodes(nodes[nodeGridPos.x + 1, nodeGridPos.y + 1]);

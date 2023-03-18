@@ -10,10 +10,11 @@ public class Pathfinding
     private const int MOVE_STRAIGHT_COST = 10;
     private const int MOVE_DIAGONAL_COST = 14;
 
-    private HashSet<NodeData> openList;
+    private List<NodeData> openList;
     private HashSet<NodeData> closeList;
 
     private GridManager gridManager;
+    private bool isInSlowMode = false;
 
     public Pathfinding()
     {
@@ -31,7 +32,7 @@ public class Pathfinding
 
         List<NodeData> path = FindPath(startNode.GetGridPos().x, startNode.GetGridPos().y, endNode.GetGridPos().x, endNode.GetGridPos().y);
 
-        if (path == null) return null;
+        //if (path == null) return null;
 
         List<Vector3> vectorPath = new List<Vector3>();
         foreach (NodeData node in path)
@@ -40,26 +41,19 @@ public class Pathfinding
         }
         return vectorPath;
     }
+
     public List<NodeData> FindPath(int startX, int startY, int endX, int endY)
     {
         Debug.Log("Pathfinding Start...");
         NodeData startNode = gridManager.GetNode(startX, startY);
         NodeData endNode = gridManager.GetNode(endX, endY);
 
-        openList = new HashSet<NodeData> { startNode };
+        openList = new List<NodeData> { startNode };
         closeList = new HashSet<NodeData>();
 
-        for (int x = 0; x < gridManager.GetGridSize().x; x++)
-        {
-            for (int y = 0; y < gridManager.GetGridSize().y; y++)
-            {
-                NodeData node = gridManager.GetNode(x, y);
-                node.gCost = int.MaxValue;
-                node.CalculateFCost();
-                node.cameFromNode = null;
-            }
-        }
+        SetAllNode();
 
+        //Set Start Node
         startNode.gCost = 0;
         startNode.hCost = CalculateDistanceCost(startNode, endNode);
         startNode.CalculateFCost();
@@ -102,17 +96,17 @@ public class Pathfinding
         return null;
     }
 
-    private int CalculateDistanceCost(NodeData startNode, NodeData endNode)
+    private int CalculateDistanceCost(NodeData currentNode, NodeData endNode)
     {
-        int xDistance = Mathf.Abs(startNode.GetGridPos().x - endNode.GetGridPos().x);
-        int yDistance = Mathf.Abs(startNode.GetGridPos().y - endNode.GetGridPos().y);
+        int xDistance = Mathf.Abs(currentNode.GetGridPos().x - endNode.GetGridPos().x);
+        int yDistance = Mathf.Abs(currentNode.GetGridPos().y - endNode.GetGridPos().y);
         int remaining = Mathf.Abs(xDistance - yDistance);
         return MOVE_DIAGONAL_COST * Mathf.Min(xDistance, yDistance) + MOVE_STRAIGHT_COST * remaining;
     }
 
-    private NodeData GetLowestFCostNode(HashSet<NodeData> openList)
+    private NodeData GetLowestFCostNode(List<NodeData> openList)
     {
-        NodeData lowestFCostNode = openList.First<NodeData>();
+        NodeData lowestFCostNode = openList[0];
         foreach (NodeData node in openList)
         {
             if (node.fCost < lowestFCostNode.fCost)
@@ -141,5 +135,29 @@ public class Pathfinding
         Debug.Log("Pathfinding Finished...");
 
         return path;
+    }
+
+    private void SetAllNode()
+    {
+        for (int x = 0; x < gridManager.GetGridSize().x; x++)
+        {
+            for (int y = 0; y < gridManager.GetGridSize().y; y++)
+            {
+                NodeData node = gridManager.GetNode(x, y);
+                node.gCost = int.MaxValue;
+                node.CalculateFCost();
+                node.cameFromNode = null;
+            }
+        }
+    }
+
+    private void SearchNode()
+    {
+        
+    }
+
+    public void SetSlowMode(bool isActive)
+    {
+        isInSlowMode = isActive;
     }
 }
