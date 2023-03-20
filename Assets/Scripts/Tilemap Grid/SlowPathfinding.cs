@@ -1,9 +1,10 @@
 using CodeMonkey.Utils;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Pathfinding
+public class SlowPathfinding : MonoBehaviour
 {
     private const int MOVE_STRAIGHT_COST = 10;
     private const int MOVE_DIAGONAL_COST = 14;
@@ -13,11 +14,13 @@ public class Pathfinding
 
     private GridManager gridManager;
 
-    public Pathfinding()
+    private void Start()
     {
         gridManager = GridManager.Instance;
+
     }
 
+    #region Pathfinding
     public List<Vector3> FindPath(Vector3 startWorldPosition, Vector3 endWorldPosition)
     {
         #nullable enable
@@ -41,8 +44,8 @@ public class Pathfinding
         return vectorPath;
     }
 
-    // Find Path yang Lancar
-    public List<NodeData> FindPath(int startX, int startY, int endX, int endY)
+    // Find Path in Slow Mode
+    public List<NodeData> FindPath(int startX, int startY, int endX, int endY, Action<List<NodeData>> callback)
     {
         Debug.Log("Pathfinding Start...");
         NodeData startNode = gridManager.GetNode(startX, startY);
@@ -57,8 +60,12 @@ public class Pathfinding
         startNode.gCost = 0;
         startNode.hCost = CalculateDistanceCost(startNode, endNode);
         startNode.CalculateFCost();
+        startNode.nodeColor = Color.green;
 
-        return SearchPossibleNode(endNode);
+        //Set End Node Color
+        endNode.nodeColor = Color.magenta;
+
+        StartCoroutine(SearchPossibleNode(endNode, callback));
     }
 
     private void SetAllNode()
@@ -73,14 +80,19 @@ public class Pathfinding
         }
     }
 
-    private List<NodeData> SearchPossibleNode(NodeData endNode)
+    IEnumerator SearchPossibleNode(NodeData endNode, Action<List<NodeData>> callback)
     {
         // Search all Node
         while (openList.Count > 0)
         {
             NodeData currentNode = GetLowestFCostNode(openList);
 
-            if (currentNode == endNode) return CalculatePath(endNode);
+            if (currentNode == endNode)
+            {
+                List<NodeData> path = CalculatePath(endNode);
+                callback(path);
+                yield break;
+            }
 
             openList.Remove(currentNode);
             closeList.Add(currentNode);
@@ -102,16 +114,22 @@ public class Pathfinding
                     neighborNode.gCost = tentativeGCost;
                     neighborNode.hCost = CalculateDistanceCost(neighborNode, endNode);
                     neighborNode.CalculateFCost();
+                    neighborNode.nodeColor = Color.yellow;
 
                     if (!openList.Contains(neighborNode))
                     {
                         openList.Add(neighborNode);
                     }
                 }
+
+                //yield return new WaitForSeconds(1);
             }
+
+            yield return null;
         }
 
-        return null;
+        callback(null);
+        yield break;
     }
 
     private int CalculateDistanceCost(NodeData currentNode, NodeData endNode)
@@ -154,4 +172,5 @@ public class Pathfinding
 
         return path;
     }
+    #endregion
 }

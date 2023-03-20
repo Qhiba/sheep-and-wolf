@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using CodeMonkey.Utils;
+using UnityEngine.UI;
 
 public class VisualizationManager : MonoBehaviour
 {
@@ -28,6 +29,7 @@ public class VisualizationManager : MonoBehaviour
     private bool isGridLineCreated = false;
 
     public GameObject textParent;
+    public Text slowModeText;
 
     private void Start()
     {
@@ -129,5 +131,11 @@ public class VisualizationManager : MonoBehaviour
         {
             node.ShowAStarVariables(isActive);
         }
+    }
+
+    public void ShowSlowModeText(bool isActive)
+    {
+        slowModeText.text = "Path Finding Currently in Slow Mode.";
+        slowModeText.gameObject.SetActive(isActive);
     }
 }

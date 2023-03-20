@@ -50,7 +50,11 @@ public class GridManager : MonoBehaviour
                 Vector3Int cellPos = new Vector3Int(x, y, 0) + offset;
                 TileBase tile = groundTilemap.GetTile(cellPos);
 
-                if (tile == null) continue;
+                if (tile == null)
+                {
+                    Debug.Log("Tile is " + tile);
+                    continue;
+                }
 
                 NodeData node = new NodeData(groundTilemap, new Vector3Int(x, y, 0), cellPos);
                 node.isWalkable = (tile == walkableTile ? true : false);
