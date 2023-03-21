@@ -53,12 +53,24 @@ public class VisualizationManager : MonoBehaviour
         }
     }
 
+    public void VisualizeFindingPathProgression()
+    {
+        for (int x = 0; x < nodes.GetLength(0); x++)
+        {
+            for (int y = 0; y < nodes.GetLength(1); y++)
+            {
+                nodes[x, y].isShowingColor = true;
+            }
+        }
+    }
+
     public void ResetColor()
     {
         for (int x = 0; x < nodes.GetLength(0); x++)
         {
             for (int y = 0; y < nodes.GetLength(1); y++)
             {
+                nodes[x, y].isShowingColor = false;
                 Vector3Int cellPos = nodes[x, y].GetCellPosition();
                 groundTile.SetColor(cellPos, Color.white);
             }

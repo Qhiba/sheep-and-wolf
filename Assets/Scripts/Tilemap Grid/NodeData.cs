@@ -11,6 +11,7 @@ public class NodeData
     private Vector3Int gridPos;
     private Vector3Int cellPos;
     public Color nodeColor;
+    public bool isShowingColor = false;
 
     public int gCost;
     public int hCost;
@@ -97,5 +98,13 @@ public class NodeData
         fCostText.gameObject.SetActive(isActive);
         gCostText.gameObject.SetActive(isActive);
         hCostText.gameObject.SetActive(isActive);
+    }
+
+    public void ShowNodeColor()
+    {
+        if (isShowingColor)
+        {
+            tilemap.SetColor(cellPos, nodeColor);
+        }
     }
 }

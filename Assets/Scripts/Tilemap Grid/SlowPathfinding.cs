@@ -2,10 +2,12 @@ using CodeMonkey.Utils;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 public class SlowPathfinding : MonoBehaviour
 {
+    #region Pathfinding Variables
     private const int MOVE_STRAIGHT_COST = 10;
     private const int MOVE_DIAGONAL_COST = 14;
 
@@ -13,39 +15,91 @@ public class SlowPathfinding : MonoBehaviour
     private HashSet<NodeData> closeList;
 
     private GridManager gridManager;
+    private List<Vector3> vectorPath;
+    #endregion
+
+    [SerializeField] float speed;
+
+    private bool isMoving = false;
 
     private void Start()
     {
         gridManager = GridManager.Instance;
+        vectorPath = new List<Vector3>();
+    }
 
+    // Update is called once per frame
+    void Update()
+    {
+        if (Input.GetMouseButtonDown(0) && !isMoving)
+        {
+            Vector3 mouseWorldPosition = UtilsClass.GetMouseWorldPosition();
+            FindPath(transform.position, mouseWorldPosition); 
+        }
+    }
+
+    // After finding a path, get path Vector position and move the character.
+    public void OnPathFindingComplete(List<NodeData> path)
+    {
+        if (path == null) vectorPath = null;
+
+        foreach (NodeData node in path)
+        {
+            vectorPath.Add(node.GetWorldPosition());
+        }
+
+        Debug.Log("Pathfinding Finished...");
+
+        // Move Character
+        if (vectorPath != null)
+        {
+            //Draw path Line
+            for (int i = 0; i < vectorPath.Count - 1; i++)
+            {
+                Debug.DrawLine(vectorPath[i] + GridManager.Instance.GetCellSize() * .5f, vectorPath[i + 1] + GridManager.Instance.GetCellSize() * .5f, Color.green, 100.0f);
+            }
+
+            StartCoroutine(MoveAlongPath(vectorPath));
+        }
+        else
+        {
+            Debug.Log("No Path Found!");
+        }
+    }
+
+    IEnumerator MoveAlongPath(List<Vector3> path)
+    {
+        isMoving = true;
+        foreach (Vector3 p in path)
+        {
+            Vector3 targetPath = p + GridManager.Instance.GetCellSize() * .5f;
+            while (transform.position != targetPath)
+            {
+                transform.position = Vector3.MoveTowards(transform.position, targetPath, speed * Time.deltaTime);
+                yield return null;
+            }
+        }
+
+        isMoving = false;
+        yield break;
     }
 
     #region Pathfinding
-    public List<Vector3> FindPath(Vector3 startWorldPosition, Vector3 endWorldPosition)
+    public void FindPath(Vector3 startWorldPosition, Vector3 endWorldPosition)
     {
         #nullable enable
         NodeData? startNode = gridManager.GetNode(startWorldPosition);
         NodeData? endNode = gridManager.GetNode(endWorldPosition);
         #nullable disable
 
-        if (startNode == null || endNode == null || !endNode.isWalkable) return null;
+        if (startNode == null || endNode == null || !endNode.isWalkable) return;
 
         Debug.Log("Start Node: " + startNode.GetGridPos() + " End Node: " + endNode.GetGridPos());
-        List<NodeData> path = FindPath(startNode.GetGridPos().x, startNode.GetGridPos().y, endNode.GetGridPos().x, endNode.GetGridPos().y);
-
-        if (path == null) return null;
-
-        List<Vector3> vectorPath = new List<Vector3>();
-        foreach (NodeData node in path)
-        {
-            vectorPath.Add(node.GetWorldPosition());
-        }
-
-        return vectorPath;
+        FindPath(startNode.GetGridPos().x, startNode.GetGridPos().y, endNode.GetGridPos().x, endNode.GetGridPos().y, OnPathFindingComplete);
     }
 
     // Find Path in Slow Mode
-    public List<NodeData> FindPath(int startX, int startY, int endX, int endY, Action<List<NodeData>> callback)
+    public void FindPath(int startX, int startY, int endX, int endY, Action<List<NodeData>> callback)
     {
         Debug.Log("Pathfinding Start...");
         NodeData startNode = gridManager.GetNode(startX, startY);
@@ -56,16 +110,7 @@ public class SlowPathfinding : MonoBehaviour
 
         SetAllNode();
 
-        //Set Start Node
-        startNode.gCost = 0;
-        startNode.hCost = CalculateDistanceCost(startNode, endNode);
-        startNode.CalculateFCost();
-        startNode.nodeColor = Color.green;
-
-        //Set End Node Color
-        endNode.nodeColor = Color.magenta;
-
-        StartCoroutine(SearchPossibleNode(endNode, callback));
+        StartCoroutine(SearchPossibleNode(startNode, endNode, callback));
     }
 
     private void SetAllNode()
@@ -80,12 +125,32 @@ public class SlowPathfinding : MonoBehaviour
         }
     }
 
-    IEnumerator SearchPossibleNode(NodeData endNode, Action<List<NodeData>> callback)
+    IEnumerator SearchPossibleNode(NodeData startNode, NodeData endNode, Action<List<NodeData>> callback)
     {
+
+        //Set Start Node
+        startNode.gCost = 0;
+        startNode.hCost = CalculateDistanceCost(startNode, endNode);
+        startNode.CalculateFCost();
+        startNode.nodeColor = Color.green;
+        startNode.ShowNodeColor();
+
+        yield return new WaitForSeconds(1);
+
+        //Set End Node Color
+        endNode.nodeColor = Color.magenta;
+        endNode.ShowNodeColor();
+
+        yield return new WaitForSeconds(1);
+
         // Search all Node
         while (openList.Count > 0)
         {
             NodeData currentNode = GetLowestFCostNode(openList);
+            currentNode.nodeColor = Color.cyan;
+            currentNode.ShowNodeColor();
+
+            yield return new WaitForSeconds(1);
 
             if (currentNode == endNode)
             {
@@ -108,21 +173,29 @@ public class SlowPathfinding : MonoBehaviour
                 }
 
                 int tentativeGCost = currentNode.gCost + CalculateDistanceCost(currentNode, neighborNode);
-                if (tentativeGCost < neighborNode.gCost)
-                {
-                    neighborNode.cameFromNode = currentNode;
-                    neighborNode.gCost = tentativeGCost;
-                    neighborNode.hCost = CalculateDistanceCost(neighborNode, endNode);
-                    neighborNode.CalculateFCost();
-                    neighborNode.nodeColor = Color.yellow;
+                Debug.Log(string.Format("Current Node {0} - g-cost = {1} \n" +
+                    "Neighbor Node {2} -> g-cost = {3} \n" +
+                    "Tentative G Cost = {4} \n" +
+                    "---------------------------------", currentNode.GetGridPos(), currentNode.gCost, neighborNode.GetGridPos(), neighborNode.gCost, tentativeGCost));
+                if (tentativeGCost >= neighborNode.gCost) continue;
+                
+                neighborNode.cameFromNode = currentNode;
+                neighborNode.gCost = tentativeGCost;
+                neighborNode.hCost = CalculateDistanceCost(neighborNode, endNode);
+                neighborNode.CalculateFCost();
 
-                    if (!openList.Contains(neighborNode))
-                    {
-                        openList.Add(neighborNode);
-                    }
+                if (neighborNode != endNode)
+                {
+                    neighborNode.nodeColor = Color.yellow;
+                    neighborNode.ShowNodeColor();
+                }                    
+
+                if (!openList.Contains(neighborNode))
+                {
+                    openList.Add(neighborNode);
                 }
 
-                //yield return new WaitForSeconds(1);
+                yield return new WaitForSeconds(1);
             }
 
             yield return null;
@@ -167,8 +240,6 @@ public class SlowPathfinding : MonoBehaviour
         }
 
         path.Reverse();
-
-        Debug.Log("Pathfinding Finished...");
 
         return path;
     }
