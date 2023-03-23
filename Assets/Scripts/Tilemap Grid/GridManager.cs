@@ -21,8 +21,6 @@ public class GridManager : MonoBehaviour
     [SerializeField] private Tilemap groundTilemap;
     [SerializeField] private Tile walkableTile;
 
-    //[SerializeField] private Grid grid;
-    
     private NodeData[,] nodes;
 
     private void Awake()
@@ -122,11 +120,8 @@ public class GridManager : MonoBehaviour
     {
         Vector3Int nodeGridPos = node.GetGridPos();
 
-        // Left Position
         if (nodeGridPos.x - 1 >= 0)
         {
-            node.SetNeighborNodes(nodes[nodeGridPos.x - 1, nodeGridPos.y]);
-
             // Left Down Position
             if (nodeGridPos.y - 1 >= 0)
             {
@@ -138,13 +133,13 @@ public class GridManager : MonoBehaviour
             {
                 node.SetNeighborNodes(nodes[nodeGridPos.x - 1, nodeGridPos.y + 1]);
             }
+
+            // Left Position
+            node.SetNeighborNodes(nodes[nodeGridPos.x - 1, nodeGridPos.y]);
         }
 
-        // Right Position
         if (nodeGridPos.x + 1 < nodes.GetLength(0))
         {
-            node.SetNeighborNodes(nodes[nodeGridPos.x + 1, nodeGridPos.y]);
-
             // Right Down Position
             if (nodeGridPos.y - 1 >= 0)
             {
@@ -156,6 +151,9 @@ public class GridManager : MonoBehaviour
             {
                 node.SetNeighborNodes(nodes[nodeGridPos.x + 1, nodeGridPos.y + 1]);
             }
+
+            // Right Position
+            node.SetNeighborNodes(nodes[nodeGridPos.x + 1, nodeGridPos.y]);
         }
 
         // Down Position

@@ -20,15 +20,21 @@ public class Pathfinding
 
     public List<Vector3> FindPath(Vector3 startWorldPosition, Vector3 endWorldPosition)
     {
+        float pathfindingStartTime = Time.realtimeSinceStartup;
+
         #nullable enable
         NodeData? startNode = gridManager.GetNode(startWorldPosition);
         NodeData? endNode = gridManager.GetNode(endWorldPosition);
         #nullable disable
 
-        if (startNode == null || endNode == null || !endNode.isWalkable) return null;
+        //if (startNode == null || endNode == null || !endNode.isWalkable) return null;
 
         Debug.Log("Start Node: " + startNode.GetGridPos() + " End Node: " + endNode.GetGridPos());
         List<NodeData> path = FindPath(startNode.GetGridPos().x, startNode.GetGridPos().y, endNode.GetGridPos().x, endNode.GetGridPos().y);
+
+        float pathfindingEndTime = Time.realtimeSinceStartup;
+        float pathfindingProcessingTime = pathfindingEndTime - pathfindingStartTime;
+        Debug.Log("Waktu proses A* = " + pathfindingProcessingTime);
 
         if (path == null) return null;
 
@@ -96,17 +102,17 @@ public class Pathfinding
                 }
 
                 int tentativeGCost = currentNode.gCost + CalculateDistanceCost(currentNode, neighborNode);
-                if (tentativeGCost < neighborNode.gCost)
-                {
-                    neighborNode.cameFromNode = currentNode;
-                    neighborNode.gCost = tentativeGCost;
-                    neighborNode.hCost = CalculateDistanceCost(neighborNode, endNode);
-                    neighborNode.CalculateFCost();
+                if (tentativeGCost >= neighborNode.gCost) continue;
+                
+                neighborNode.cameFromNode = currentNode;
+                neighborNode.gCost = tentativeGCost;
+                neighborNode.hCost = CalculateDistanceCost(neighborNode, endNode);
+                neighborNode.CalculateFCost();
 
-                    if (!openList.Contains(neighborNode))
-                    {
-                        openList.Add(neighborNode);
-                    }
+                if (!openList.Contains(neighborNode))
+                {
+
+                    openList.Add(neighborNode);
                 }
             }
         }
@@ -114,10 +120,10 @@ public class Pathfinding
         return null;
     }
 
-    private int CalculateDistanceCost(NodeData currentNode, NodeData endNode)
+    private int CalculateDistanceCost(NodeData nodeA, NodeData nodeB)
     {
-        int xDistance = Mathf.Abs(currentNode.GetGridPos().x - endNode.GetGridPos().x);
-        int yDistance = Mathf.Abs(currentNode.GetGridPos().y - endNode.GetGridPos().y);
+        int xDistance = Mathf.Abs(nodeA.GetGridPos().x - nodeB.GetGridPos().x);
+        int yDistance = Mathf.Abs(nodeA.GetGridPos().y - nodeB.GetGridPos().y);
         int remaining = Mathf.Abs(xDistance - yDistance);
         return MOVE_DIAGONAL_COST * Mathf.Min(xDistance, yDistance) + MOVE_STRAIGHT_COST * remaining;
     }

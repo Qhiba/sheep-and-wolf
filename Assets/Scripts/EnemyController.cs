@@ -6,8 +6,6 @@ using UnityEditor;
 
 public class EnemyController : MonoBehaviour
 {
-    bool isMouseControllOn = true;
-
     [SerializeField] float speed;
 
     private Pathfinding pathfinding;
@@ -23,26 +21,29 @@ public class EnemyController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (isMouseControllOn)
+        if (Input.GetMouseButtonDown(0))
         {
-            if (Input.GetMouseButtonDown(0) && !isMoving)
+            if (isMoving)
             {
-                Vector3 mouseWorldPosition = UtilsClass.GetMouseWorldPosition();
-                List<Vector3> path = pathfinding.FindPath(transform.position, mouseWorldPosition);
-                if (path != null)
-                {
-                    //Draw path Line
-                    for (int i = 0; i < path.Count - 1; i++)
-                    {
-                        Debug.DrawLine(path[i] + GridManager.Instance.GetCellSize() * .5f, path[i + 1] + GridManager.Instance.GetCellSize() * .5f, Color.green, 100.0f);
-                    }
+                StopAllCoroutines();
+            }
 
-                    StartCoroutine(MoveAlongPath(path));   
-                }
-                else
+            Vector3 mouseWorldPosition = UtilsClass.GetMouseWorldPosition();
+            List<Vector3> path = pathfinding.FindPath(transform.position, mouseWorldPosition);
+            if (path != null)
+            {
+                //Draw path Line
+                for (int i = 0; i < path.Count - 1; i++)
                 {
-                    Debug.Log("No Path Found!");
+
+                    Debug.DrawLine(path[i] + GridManager.Instance.GetCellSize() * .5f, path[i + 1] + GridManager.Instance.GetCellSize() * .5f, Color.green, 100.0f);
                 }
+
+                StartCoroutine(MoveAlongPath(path));   
+            }
+            else
+            {
+                Debug.Log("No Path Found!");
             }
         }
     }
@@ -50,9 +51,9 @@ public class EnemyController : MonoBehaviour
     IEnumerator MoveAlongPath(List<Vector3> path)
     {
         isMoving = true;
-        foreach (Vector3 p in path)
+        for (int i = 1; i < path.Count; i++)
         {
-            Vector3 targetPath = p + GridManager.Instance.GetCellSize() * .5f;
+            Vector3 targetPath = path[i] + GridManager.Instance.GetCellSize() * .5f;
             while (transform.position != targetPath)
             {
                 transform.position = Vector3.MoveTowards(transform.position, targetPath, speed * Time.deltaTime);

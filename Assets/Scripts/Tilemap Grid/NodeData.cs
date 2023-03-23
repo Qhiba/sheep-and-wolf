@@ -76,6 +76,7 @@ public class NodeData
         CalculateFCost();
         cameFromNode = null;
         nodeColor = Color.white;
+        tilemap.SetColor(cellPos, nodeColor);
 
         gCostText.text = "G";
         hCostText.text = "H";
